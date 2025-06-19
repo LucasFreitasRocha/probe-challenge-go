@@ -1,7 +1,7 @@
 package service
 
 import (
-	"fmt"
+	"github.com/LucasFreitasRocha/probe-challenge-go/config/rest_err"
 	"github.com/LucasFreitasRocha/probe-challenge-go/model"
 	"github.com/LucasFreitasRocha/probe-challenge-go/repository"
 )
@@ -30,8 +30,8 @@ func NewProbeService(
 
 
 type ProbeService interface {
-	CreateProbe(probe *model.Probe) (model.Probe, error)
-	ExecuteCommand(command string, id uint) (model.Probe, error)
+	CreateProbe(probe *model.Probe) (model.Probe, *rest_err.RestErr)
+	ExecuteCommand(command string, id uint) (model.Probe, *rest_err.RestErr)
 }
 
 type probeService struct{
@@ -39,7 +39,7 @@ type probeService struct{
 }
 
 
-func (p *probeService) CreateProbe(probe *model.Probe) (model.Probe, error) {
+func (p *probeService) CreateProbe(probe *model.Probe) (model.Probe, *rest_err.RestErr) {
 	createdProbe, err := p.probeRepository.CreateProbe(*probe)
 	if err != nil {
 		return model.Probe{}, err
@@ -48,22 +48,15 @@ func (p *probeService) CreateProbe(probe *model.Probe) (model.Probe, error) {
 }
 
 
-func (p *probeService) ExecuteCommand(command string, id uint) (model.Probe, error) {
+func (p *probeService) ExecuteCommand(command string, id uint) (model.Probe, *rest_err.RestErr) {
 	var probe model.Probe
 
 	probe, err := p.probeRepository.GetProbeByID(id)
 	if err != nil {
-		return model.Probe{}, fmt.Errorf("probe not found: %v", err)
+		return model.Probe{}, err
 	}
-
 	movementProbe(&probe, command)
-
-	probe, err = p.probeRepository.UpdateProbe(&probe)
-	if err != nil {
-		return model.Probe{}, fmt.Errorf("failed to save probe state: %v", err)
-	}
-
-	return probe, nil
+	return p.probeRepository.UpdateProbe(&probe)
 }
 
 
