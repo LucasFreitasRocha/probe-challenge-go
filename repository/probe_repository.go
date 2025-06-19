@@ -44,7 +44,7 @@ func (r *probeRepository) UpdateProbe(probe *model.Probe) (model.Probe, *rest_er
 func (r *probeRepository) GetProbeByID(id uint) (model.Probe, *rest_err.RestErr) {
 	var probe model.Probe
 	if err := r.database.First(&probe, id).Error; err != nil {
-		return model.Probe{}, rest_err.NewBadRequestError("probe not found: " + err.Error()) 
+		return model.Probe{}, rest_err.NewNotFoundError(err.Error()) 
 	}
 	return probe, nil
 }
