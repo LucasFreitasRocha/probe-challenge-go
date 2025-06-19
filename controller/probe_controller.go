@@ -3,6 +3,7 @@ package controller
 import (
 	"strconv"
 
+	"github.com/LucasFreitasRocha/probe-challenge-go/config/logger"
 	"github.com/LucasFreitasRocha/probe-challenge-go/config/rest_err"
 	"github.com/LucasFreitasRocha/probe-challenge-go/dto"
 	"github.com/LucasFreitasRocha/probe-challenge-go/model"
@@ -13,6 +14,7 @@ import (
 func NewProbeController(
 	probeService service.ProbeService,
 ) ProbeController {
+	logger.Info("Creating new probe controller")
 	return &probeController{
 		probeService: probeService,
 	}
@@ -39,6 +41,7 @@ func (pc *probeController) CreateProbe(c *gin.Context) {
 	if err != nil {
 		c.JSON(err.Code, gin.H{
 			"error": err.Message,
+			"cause": err.Causes,
 		})
 		return
 	}
