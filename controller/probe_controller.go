@@ -1,14 +1,33 @@
 package controller
 
 import (
-	"probe-challenge/dto"
-	"probe-challenge/model"
-	"probe-challenge/service"
-	"github.com/gin-gonic/gin"
 	"strconv"
+
+	"github.com/LucasFreitasRocha/probe-challenge-go/dto"
+	"github.com/LucasFreitasRocha/probe-challenge-go/model"
+	"github.com/LucasFreitasRocha/probe-challenge-go/service"
+	"github.com/gin-gonic/gin"
 )
 
-func CreateProbe(c *gin.Context) {
+func NewProbeController(
+	probeService service.ProbeService,
+) ProbeController {
+	return &probeController{
+		probeService: probeService,
+	}
+}
+
+
+type ProbeController interface {
+	CreateProbe(c *gin.Context)
+	ExecuteCommand(c *gin.Context)
+}
+
+type probeController struct {
+	probeService service.ProbeService
+}
+
+func (pc *probeController) CreateProbe(c *gin.Context) {
 	var probe model.Probe
 	if err := c.ShouldBindJSON(&probe); err != nil {
 		c.JSON(400, gin.H{
@@ -17,8 +36,7 @@ func CreateProbe(c *gin.Context) {
 		return
 	}
 
-	probeService := service.ProbeServiceSingleton.GetProbeService()
-	probe, err := probeService.CreateProbe(&probe)
+	probe , err := pc.probeService.CreateProbe(&probe)
 	
 
 	if err != nil {
@@ -32,7 +50,7 @@ func CreateProbe(c *gin.Context) {
 	c.JSON(200, probeDto)
 }
 
-func ExecuteCommand(c *gin.Context) {
+func (pc *probeController) ExecuteCommand(c *gin.Context) {
 	id := c.Param("id")
 	var command dto.CommandDTO
 	if err := c.ShouldBindJSON(&command); err != nil {
@@ -41,8 +59,6 @@ func ExecuteCommand(c *gin.Context) {
 		})
 		return
 	}
-
-	probeService := service.ProbeServiceSingleton.GetProbeService()
 	probeID, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -50,7 +66,7 @@ func ExecuteCommand(c *gin.Context) {
 		})
 		return
 	}
-	result, err := probeService.ExecuteCommand(command.Command, uint(probeID))
+	result, err := pc.probeService.ExecuteCommand(command.Command, uint(probeID))
 
 	if err != nil {
 		c.JSON(500, gin.H{

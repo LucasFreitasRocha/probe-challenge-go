@@ -2,10 +2,9 @@ package service
 
 import (
 	"fmt"
-	"probe-challenge/database"
-	"probe-challenge/model"
+	"github.com/LucasFreitasRocha/probe-challenge-go/model"
+	"github.com/LucasFreitasRocha/probe-challenge-go/repository"
 )
-
 
 var spinLeft = map[string]string{
 	"N": "W",
@@ -21,50 +20,50 @@ var spinRight = map[string]string{
 	"W": "N",
 }
 
-type ProbeServiceInterface interface {
-	CreateProbe(probe *model.Probe) (model.Probe, error)
-	ExecuteCommand( command string, id uint) (model.Probe, error)
+func NewProbeService(
+	probeRepository repository.ProbeRepository,
+) ProbeService {
+	return &probeService{
+		probeRepository: probeRepository,
+	}
 }
 
-type ProbeService struct{}
 
-var ProbeServiceSingleton *ProbeService; 
+type ProbeService interface {
+	CreateProbe(probe *model.Probe) (model.Probe, error)
+	ExecuteCommand(command string, id uint) (model.Probe, error)
+}
 
-func (p ProbeService) CreateProbe(probe *model.Probe) (model.Probe, error) {
-	if err := database.DB.Create(probe).Error; err != nil {
+type probeService struct{
+	probeRepository repository.ProbeRepository
+}
+
+
+func (p *probeService) CreateProbe(probe *model.Probe) (model.Probe, error) {
+	createdProbe, err := p.probeRepository.CreateProbe(*probe)
+	if err != nil {
 		return model.Probe{}, err
 	}
-	return *probe, nil
-}
-
-// movementProbe updates the probe's position or direction based on the command.
-
-
-
-
-
-func (p *ProbeService) GetProbeService() *ProbeService{
-	if ProbeServiceSingleton == nil {
-		fmt.Println("Initializing ProbeServiceSingleton")
-		ProbeServiceSingleton = &ProbeService{}
-	}
-	return ProbeServiceSingleton;
+	return createdProbe, nil
 }
 
 
-func (p *ProbeService) ExecuteCommand(command string, id uint) (model.Probe, error) {
-	probe := &model.Probe{}
-	if err := database.DB.First(probe, id).Error; err != nil {
+func (p *probeService) ExecuteCommand(command string, id uint) (model.Probe, error) {
+	var probe model.Probe
+
+	probe, err := p.probeRepository.GetProbeByID(id)
+	if err != nil {
 		return model.Probe{}, fmt.Errorf("probe not found: %v", err)
 	}
 
-	movementProbe(probe, command)
+	movementProbe(&probe, command)
 
-	if err := database.DB.Save(probe).Error; err != nil {
+	probe, err = p.probeRepository.UpdateProbe(&probe)
+	if err != nil {
 		return model.Probe{}, fmt.Errorf("failed to save probe state: %v", err)
 	}
 
-	return *probe, nil
+	return probe, nil
 }
 
 
