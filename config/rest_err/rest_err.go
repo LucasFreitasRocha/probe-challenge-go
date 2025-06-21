@@ -7,16 +7,16 @@ import "net/http"
 // @Description Structure for describing why the error occurred
 type RestErr struct {
 	// Error message.
-	Message string `json:"message" example:"error trying to process request"`
+	Message string `json:"message,omitempty" example:"error trying to process request"`
 
 	// Error description.
-	Err string `json:"error" example:"internal_server_error"`
+	Err string `json:"error,omitempty" example:"internal_server_error"`
 
 	// Error code.
-	Code int `json:"code" example:"500"`
+	Code int `json:"code,omitempty" example:"500"`
 
 	// Error causes.
-	Causes []Causes `json:"causes"`
+	Causes []Causes `json:"causes,omitempty"`
 }
 
 // Causes represents the error causes.

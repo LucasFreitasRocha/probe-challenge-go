@@ -11,8 +11,15 @@ func SetupProbeRoutes(router *gin.Engine, controller controller.ProbeController)
 	{
 		probeGroup.POST("/", controller.CreateProbe)
 
-		probeGroup.POST("/:id/command", controller.ExecuteCommand)
+	}
+}
 
+
+func SetupCommandRoutes(router *gin.Engine, controller controller.CommandController) {
+	commandGroup := router.Group("/command")
+	{
+		commandGroup.POST("/", controller.ExecuteCommand)
+	
 	}
 }
 

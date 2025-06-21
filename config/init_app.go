@@ -11,7 +11,6 @@ import (
 	"github.com/LucasFreitasRocha/probe-challenge-go/service"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"gorm.io/gorm"
 )
 
 func InitApp() {
@@ -23,16 +22,22 @@ func InitApp() {
 	}
 
 	router := gin.Default()
-	routes.SetupProbeRoutes(router, initControllers(db))
+	probeService := service.NewProbeService(repository.NewProbeRepository(db))
+	routes.SetupProbeRoutes(router, initProbeController(probeService))
+	routes.SetupCommandRoutes(router, initCommandController(probeService))
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
 	} 
 
 }
 
+func initCommandController(probeService service.ProbeService) controller.CommandController {
+	commandService := service.NewCommandService(probeService)
+	return controller.NewCommandController(commandService)
+}
 
-func initControllers(db *gorm.DB) controller.ProbeController {
-	probeRepository := repository.NewProbeRepository(db)
-	probeService := service.NewProbeService(probeRepository)
+
+func initProbeController(probeService service.ProbeService) controller.ProbeController {
+
 	return controller.NewProbeController(probeService)
 }
