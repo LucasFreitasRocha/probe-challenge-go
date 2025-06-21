@@ -70,15 +70,6 @@ func (p *probeService) UpdateProbe(probe *model.Probe) (model.Probe, *rest_err.R
 
 
 
-func contains(strs []string, target string) bool {
-	for _, s := range strs {
-		if s == target {
-			return true
-		}
-	}
-	return false
-}
-
 func validateCreateProbe(probe, probeResponse *model.Probe) *rest_err.RestErr {
 	causes := []rest_err.Causes{}
 

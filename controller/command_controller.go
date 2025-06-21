@@ -28,6 +28,7 @@ func (c *commandController) ExecuteCommand(co *gin.Context) {
 	var command dto.CommandDTO
 	if err := co.ShouldBindJSON(&command); err != nil {
 		notValidPayload(co)
+		return
 	}
 	probe, err := c.commandService.ExecuteCommand(command.Command, command.IdProbe)
 	if err != nil {

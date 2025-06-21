@@ -1,7 +1,6 @@
 package service
 
 import (
-	"regexp"
 
 	"github.com/LucasFreitasRocha/probe-challenge-go/config/logger"
 	"github.com/LucasFreitasRocha/probe-challenge-go/config/rest_err"
@@ -62,7 +61,3 @@ func movementProbe(probe *model.Probe, commands string) {
 }
 
 
-func validateString(s string, r string) bool {
-	re := regexp.MustCompile(r)
-	return re.MatchString(s)
-}
