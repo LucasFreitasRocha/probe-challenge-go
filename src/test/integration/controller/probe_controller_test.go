@@ -3,30 +3,24 @@ package controller_test
 import (
 	"bytes"
 	"context"
-	"fmt"
-	"log"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config"
-	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/model"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/rest_err"
 	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/routes"
 	"github.com/gin-gonic/gin"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-func TestCreateProbe(t *testing.T) {
-	fmt.Println("Iniciando teste de criação de sonda")
-	db, cleanup, err := SetupTestDB(context.Background())
+func TestCreateProbeSuccess(t *testing.T) {
+	db, cleanup, err := setupTestDB(context.Background())
 	if err != nil {
 		t.Fatalf("Erro ao configurar o banco de dados: %v", err)
 	}
 	defer cleanup()
-	db.AutoMigrate(&model.Probe{})
+	
 	r := gin.Default()
 	probeService := config.InitProbeService(db)
 	routes.SetupProbeRoutes(r, config.InitProbeController(probeService))
@@ -42,54 +36,45 @@ func TestCreateProbe(t *testing.T) {
 	}
 }
 
-
-
-func SetupTestDB(ctx context.Context) (*gorm.DB, func(), error) {
-	req := testcontainers.ContainerRequest{
-		Image:        "postgres:15",
-		ExposedPorts: []string{"5432/tcp"},
-		Env: map[string]string{
-			"POSTGRES_USER":     "test",
-			"POSTGRES_PASSWORD": "test",
-			"POSTGRES_DB":       "probe_test",
-		},
-		WaitingFor: wait.ForListeningPort("5432/tcp"),
-	}
-
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+func TestCreateProbeInvalidDirection(t *testing.T) {
+	db, cleanup, err := setupTestDB(context.Background())
 	if err != nil {
-		return nil, nil, err
+		t.Fatalf("Erro ao configurar o banco de dados: %v", err)
 	}
+	defer cleanup()
+	r := gin.Default()
+	probeService := config.InitProbeService(db)
+	routes.SetupProbeRoutes(r, config.InitProbeController(probeService))
+	body := []byte(`{"name":"Robo1","direction":"X","position_x":1,"position_y":2}`)
+	req, _ := http.NewRequest("POST", "/probes", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
 
-	host, err := container.Host(ctx)
-	if err != nil {
-		return nil, nil, err
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("esperava 400, recebeu %d", w.Code)
 	}
+	bodyBytes := w.Body.Bytes()
 
-	port, err := container.MappedPort(ctx, "5432")
-	if err != nil {
-		return nil, nil, err
+	var restErr rest_err.RestErr
+	if err := json.Unmarshal(bodyBytes, &restErr); err != nil {
+		t.Fatalf("erro ao decodificar resposta: %v", err)
 	}
-
-	dsn := fmt.Sprintf("host=%s port=%s user=test password=test dbname=probe_test sslmode=disable",
-		host, port.Port())
-
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		container.Terminate(ctx)
-		return nil, nil, err
-	}
-
-	cleanup := func() {
-		if err := container.Terminate(ctx); err != nil {
-			log.Printf("Erro ao parar o container: %v", err)
+	var directionMsg string
+	for _, cause := range restErr.Causes {
+		if cause.Field == "direction" {
+			directionMsg = cause.Message
+			if directionMsg != "direction not valid, must be one of: N, E, S, W" {
+				t.Fatalf("mensagem de erro inesperada: %s", directionMsg)
+			}
 		}
 	}
-	
 
-	return db, cleanup, nil
 }
+
+
+
+
+
 
