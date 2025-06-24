@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/LucasFreitasRocha/probe-challenge-go/config"
-	"github.com/LucasFreitasRocha/probe-challenge-go/config/logger"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/logger"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LucasFreitasRocha/probe-challenge-go/model"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

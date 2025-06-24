@@ -2,10 +2,10 @@ package service
 
 import (
 
-	"github.com/LucasFreitasRocha/probe-challenge-go/config/logger"
-	"github.com/LucasFreitasRocha/probe-challenge-go/config/rest_err"
-	"github.com/LucasFreitasRocha/probe-challenge-go/model"
-	"github.com/LucasFreitasRocha/probe-challenge-go/repository"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/logger"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/rest_err"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/model"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/repository"
 )
 
 var spinLeft = map[string]string{
@@ -46,8 +46,9 @@ type probeService struct {
 
 func (p *probeService) CreateProbe(probe *model.Probe) (model.Probe, *rest_err.RestErr) {
 	probeResponse, err := p.probeRepository.GetProbeBy(probe.Name, probe.PositionX, probe.PositionY)
-	if err != nil {
+	if err != nil && err.Code != rest_err.NOT_FOUND {
 		rest_err.NewInternalServerError(err.Error())
+		return model.Probe{}, err
 	}
 	err = validateCreateProbe(probe, probeResponse)
 	if err != nil {

@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"github.com/LucasFreitasRocha/probe-challenge-go/config/logger"
-	"github.com/LucasFreitasRocha/probe-challenge-go/dto"
-	"github.com/LucasFreitasRocha/probe-challenge-go/service"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/logger"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/dto"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/service"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/LucasFreitasRocha/probe-challenge-go/config/rest_err"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/rest_err"
 	"github.com/gin-gonic/gin"
 )
 

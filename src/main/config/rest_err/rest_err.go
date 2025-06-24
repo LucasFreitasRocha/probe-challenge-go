@@ -2,6 +2,8 @@ package rest_err
 
 import "net/http"
 
+
+var NOT_FOUND = http.StatusNotFound
 // RestErr represents the error object.
 // @Summary Error information
 // @Description Structure for describing why the error occurred

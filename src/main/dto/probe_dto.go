@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/LucasFreitasRocha/probe-challenge-go/model"
+import "github.com/LucasFreitasRocha/probe-challenge-go/src/main/model"
 
 type ProbeDTO struct {
 	Id        uint   `json:"id"`

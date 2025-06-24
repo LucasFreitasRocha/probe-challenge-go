@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/LucasFreitasRocha/probe-challenge-go/controller"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/controller"
 	"github.com/gin-gonic/gin"
 )
 
@@ -9,7 +9,7 @@ func SetupProbeRoutes(router *gin.Engine, controller controller.ProbeController)
 
 	probeGroup := router.Group("/probes")
 	{
-		probeGroup.POST("/", controller.CreateProbe)
+		probeGroup.POST("", controller.CreateProbe)
 
 	}
 }
@@ -18,7 +18,7 @@ func SetupProbeRoutes(router *gin.Engine, controller controller.ProbeController)
 func SetupCommandRoutes(router *gin.Engine, controller controller.CommandController) {
 	commandGroup := router.Group("/command")
 	{
-		commandGroup.POST("/", controller.ExecuteCommand)
+		commandGroup.POST("", controller.ExecuteCommand)
 	
 	}
 }

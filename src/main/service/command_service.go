@@ -2,9 +2,9 @@ package service
 
 import (
 
-	"github.com/LucasFreitasRocha/probe-challenge-go/config/logger"
-	"github.com/LucasFreitasRocha/probe-challenge-go/config/rest_err"
-	"github.com/LucasFreitasRocha/probe-challenge-go/model"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/logger"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/config/rest_err"
+	"github.com/LucasFreitasRocha/probe-challenge-go/src/main/model"
 )
 
 type CommandService interface {
